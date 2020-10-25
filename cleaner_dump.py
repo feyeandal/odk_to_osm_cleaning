@@ -13,7 +13,16 @@ def capitalize(fieldval):
             outval.append(val.title())
     return ' '.join(outval)
 
-def foo(directory):
+def foo(directory, out_path):
+    # Create folder inside output folder
+    folder = os.path.basename(directory) # Returns 10222020 etc
+    output_folder = os.path.join(out_path, folder)
+    print(output_folder)
+    try:
+        os.mkdir(output_folder)
+    except Exception as e:
+        print(e)
+
     # Iterate on each CSV file downloaded from the server
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
@@ -72,12 +81,26 @@ def foo(directory):
                 if title in renamed_df.columns:
                     capitalizer = lambda x: capitalize(x)
                     renamed_df[title] = renamed_df[title].apply(capitalizer)
-                    
-            # Write to a CSV file
-            renamed_df.to_csv(path + '\output/' + filename, index=None)
+            
+
+            # Write to a CSV file using output_folder
+            renamed_df.to_csv(os.path.join(output_folder, filename), index=None)
 
 if __name__ == '__main__': 
-    directory = r'C:\Users\andal\Documents\GIS\odk_cleaner\new'
-    directories = [directory + '\\10222020/', directory +'\\10232020/']
+    # directory = r'C:\Users\andal\Documents\GIS\odk_cleaner\new'
+    base_dir = os.path.dirname(os.path.abspath('__file__')) # Get the current location of the file as the base path
+    out_path = os.path.join(base_dir, 'output')
+    input_path = os.path.join(base_dir, 'input')
+
+    # Try to create overall output folder
+    try:
+        os.mkdir(out_path)
+    except Exception as e:
+        print(e)
+
+    folders = os.listdir(input_path)
+    map_dir_to_folder = lambda x: os.path.join(input_path, x) # Function to join directory with specific folder
+    directories = map(map_dir_to_folder, folders) # Apply that function to the folders list. Read on python map and lambda
     for path in directories:
-        foo(path)
+        print(path, out_path)
+        foo(path, out_path)
