@@ -66,8 +66,11 @@ def foo(directory, out_path):
             }))
 
             # Force building level values to integer type
-            renamed_df['building:levels'] = renamed_df['building:levels'].replace(' ','NaN', regex=True)
-            renamed_df['building:levels'] = pd.to_numeric(renamed_df['building:levels'], errors='coerce').astype('Int64')
+            int_col = ['building:levels']
+            for inte in int_col:
+                if inte in renamed_df.columns:
+                    renamed_df[inte] = renamed_df[inte].replace(' ','NaN', regex=True)
+                    renamed_df[inte] = pd.to_numeric(renamed_df[inte], errors='coerce').astype('Int64')
 
             # Replace whitespace with semi-colon on multiple selection values
             col_names = ['building:material', 'floor:material', 'roof:material', 'healthcare']
