@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 def capitalize(fieldval):
     fieldval = str(fieldval)
@@ -29,6 +30,12 @@ def foo(directory, out_path):
             print(filename)
             file_path = os.path.join(directory, filename)
             df = pd.read_csv(file_path)
+
+            # Change date format
+            if 'survey_date_today' in df.columns:
+                df['survey_date_today'] = pd.to_datetime(df.survey_date_today)
+                df['survey:date'] = df['survey_date_today'].dt.strftime('%m%d%Y')
+
             # Delete unnecessary tags
             df.drop(['survey_date_today','geopoint.altitude','geopoint.precision','meta.instanceId','meta.instanceName', 
             'meta.formId','meta.deviceId','meta.submissionTime'], axis=1, inplace=True, errors='ignore')
@@ -65,6 +72,17 @@ def foo(directory, out_path):
             'geopoint.longitude' : 'longitude'
             }))
 
+            # Auto-add relevant and default columns to a specific critical infra
+            if 'emergency:amenity' in renamed_df.columns:
+                renamed_df['emergency:social_facility'] = np.where(renamed_df['emergency:amenity']!= 'social_facility', ' ', 'shelter')
+                renamed_df['emergency:social_facility:for'] = np.where(renamed_df['emergency:amenity']!= 'social_facility', ' ', 'displaced')
+            if 'social_facility' in renamed_df.columns:
+                renamed_df['social_facility:for'] = np.where(renamed_df['social_facility']!= 'shelter', ' ', 'displaced')
+            if 'highway' in renamed_df.columns:
+                renamed_df['motorcycle'] = np.where(renamed_df['highway']!= 'motorway', ' ', 'no')
+                renamed_df['bicycle'] = np.where(renamed_df['highway']!= 'motorway', ' ', 'no')
+                renamed_df['toll'] = np.where(renamed_df['highway']!= 'motorway', ' ', 'yes')
+
             # Force building level values to integer type
             int_col = ['building:levels']
             for inte in int_col:
@@ -85,7 +103,10 @@ def foo(directory, out_path):
                     capitalizer = lambda x: capitalize(x)
                     renamed_df[title] = renamed_df[title].apply(capitalizer)
             
-
+            # Auto-add PhilAWARE columns
+            renamed_df['survey:name']='PDC PhilAWARE'
+            renamed_df['source']='survey'
+            
             # Write to a CSV file using output_folder
             renamed_df.to_csv(os.path.join(output_folder, filename), index=None)
 
