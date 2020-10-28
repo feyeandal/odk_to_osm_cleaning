@@ -84,7 +84,7 @@ def foo(directory, out_path):
                 renamed_df['toll'] = np.where(renamed_df['highway']!= 'motorway', ' ', 'yes')
 
             # Force building level values to integer type
-            int_col = ['building:levels']
+            int_col = ['building:levels', 'admin_level']
             for inte in int_col:
                 if inte in renamed_df.columns:
                     renamed_df[inte] = renamed_df[inte].replace(' ','NaN', regex=True)
@@ -102,6 +102,7 @@ def foo(directory, out_path):
                 if title in renamed_df.columns:
                     capitalizer = lambda x: capitalize(x)
                     renamed_df[title] = renamed_df[title].apply(capitalizer)
+                    renamed_df[title] = renamed_df[title].replace('Nan', ' ', regex=True)
             
             # Auto-add PhilAWARE columns
             renamed_df['survey:name']='PDC PhilAWARE'
