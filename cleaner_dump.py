@@ -91,7 +91,7 @@ def foo(directory, out_path):
                     renamed_df[inte] = pd.to_numeric(renamed_df[inte], errors='coerce').astype('Int64')
 
             # Replace whitespace with semi-colon on multiple selection values
-            col_names = ['building:material', 'floor:material', 'roof:material', 'healthcare']
+            col_names = ['building:material', 'floor:material', 'roof:material', 'healthcare', 'social_facility:for']
             for col in col_names:
                 if col in renamed_df.columns:
                     renamed_df[col] = renamed_df[col].replace(' ', ';', regex=True)
