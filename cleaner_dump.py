@@ -102,7 +102,7 @@ def foo(directory, out_path):
                 if title in renamed_df.columns:
                     capitalizer = lambda x: capitalize(x)
                     renamed_df[title] = renamed_df[title].apply(capitalizer)
-                    renamed_df[title] = renamed_df[title].replace('Nan', ' ', regex=True)
+                    renamed_df[title] = renamed_df[title].replace('Nan', '', regex=True)
             
             # Auto-add PhilAWARE columns
             renamed_df['survey:name']='PDC PhilAWARE'
